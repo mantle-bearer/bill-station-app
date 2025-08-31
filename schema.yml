@@ -1,0 +1,438 @@
+openapi: 3.0.3
+info:
+  title: Bill Station Auth API
+  version: 1.0.0
+  description: This API is the User Authentication System for Bill Station
+paths:
+  /api/auth/forgot-password:
+    post:
+      operationId: api_auth_forgot_password_create
+      description: This endpoint generates a password reset token and sends it to
+        the user.
+      summary: Request password reset token
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+              examples:
+                PasswordResetTokenGenerated:
+                  value:
+                    status: success
+                    message: Password reset token generated
+                    reset_token: reset_token_value
+                    expires_in: 10 minutes
+                  summary: Password reset token generated
+          description: Reset token generated
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+              examples:
+                UserNotFound:
+                  value:
+                    status: failure
+                    message: User with this email does not exist
+                    error_code: user_not_found
+                  summary: User not found
+          description: User not found
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+              examples:
+                InvalidEmailFormat:
+                  value:
+                    status: failure
+                    message: Invalid email format
+                    error_code: invalid_email
+                  summary: Invalid email format
+          description: Bad request
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+              examples:
+                ServerError:
+                  value:
+                    status: failure
+                    message: Internal server error
+                    error_code: server_error
+                  summary: Server error
+          description: Internal server error
+  /api/auth/login:
+    post:
+      operationId: api_auth_login_create
+      description: This endpoint allows a user to login and receive JWT tokens for
+        authentication.
+      summary: Login user with email and password
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+              examples:
+                LoginSuccessful:
+                  value:
+                    status: success
+                    message: Login successful
+                    data:
+                      user:
+                        id: 1
+                        email: user@example.com
+                        full_name: John Doe
+                        created_at: '2025-04-24T12:00:00Z'
+                      tokens:
+                        access: access_token_value
+                        refresh: refresh_token_value
+                  summary: Login successful
+          description: Login successful
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+              examples:
+                InvalidCredentials:
+                  value:
+                    status: failure
+                    message: Invalid credentials
+                    error_code: invalid_credentials
+                  summary: Invalid credentials
+          description: Invalid credentials
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+              examples:
+                AccountDisabled:
+                  value:
+                    status: failure
+                    message: User account is disabled
+                    error_code: account_disabled
+                  summary: Account disabled
+          description: User account is disabled
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+              examples:
+                ServerError:
+                  value:
+                    status: failure
+                    message: Internal server error
+                    error_code: server_error
+                  summary: Server error
+          description: Internal server error
+  /api/auth/register:
+    post:
+      operationId: api_auth_register_create
+      description: This endpoint registers a new user and returns JWT tokens for authentication.
+      summary: Register a new user
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+              examples:
+                UserRegistrationSuccessful:
+                  value:
+                    status: success
+                    message: User registered successfully
+                    data:
+                      id: 1
+                      email: user@example.com
+                      full_name: John Doe
+                      created_at: '2025-04-24T12:00:00Z'
+                  summary: User registration successful
+          description: User created successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+              examples:
+                InvalidEmailFormat:
+                  value:
+                    status: failure
+                    message: Validation errors
+                    errors:
+                      email:
+                      - Enter a valid email address.
+                  summary: Invalid email format
+          description: Validation errors
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+              examples:
+                EmailAlreadyInUse:
+                  value:
+                    status: failure
+                    message: Email already exists
+                    error_code: email_exists
+                  summary: Email already in use
+          description: Email already exists
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+              examples:
+                ServerError:
+                  value:
+                    status: failure
+                    message: Internal server error
+                    error_code: server_error
+                  summary: Server error
+          description: Internal server error
+  /api/auth/reset-password:
+    post:
+      operationId: api_auth_reset_password_create
+      description: This endpoint allows a user to reset their password using the reset
+        token.
+      summary: Reset password using token
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+              examples:
+                PasswordResetSuccessful:
+                  value:
+                    status: success
+                    message: Password reset successful
+                  summary: Password reset successful
+          description: Password reset successful
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+              examples:
+                InvalidOrExpiredResetToken:
+                  value:
+                    status: failure
+                    message: Invalid or expired reset token
+                    error_code: invalid_token
+                  summary: Invalid or expired reset token
+          description: Invalid or expired token
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+              examples:
+                UserNotFound:
+                  value:
+                    status: failure
+                    message: User not found
+                    error_code: user_not_found
+                  summary: User not found
+          description: User not found
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+              examples:
+                ServerError:
+                  value:
+                    status: failure
+                    message: Internal server error
+                    error_code: server_error
+                  summary: Server error
+          description: Internal server error
+components:
+  schemas:
+    ForgotPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email
+      - password
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - email
+      - password
+    ResetPassword:
+      type: object
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+        confirm_password:
+          type: string
+      required:
+      - confirm_password
+      - new_password
+      - token
+    ResetPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+        confirm_password:
+          type: string
+          minLength: 1
+      required:
+      - confirm_password
+      - new_password
+      - token
+    UserRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        full_name:
+          type: string
+          maxLength: 255
+      required:
+      - email
+      - full_name
+    UserRegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        full_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - full_name
+      - password
+      - password_confirm
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
