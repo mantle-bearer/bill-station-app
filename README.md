@@ -192,7 +192,3 @@ coverage report
  **Deployed Application**: [Your Render URL here]
 
  **API Documentation**: [Your Render URL]/swagger/
-
-
-```
-```
