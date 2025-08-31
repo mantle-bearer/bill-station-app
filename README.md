@@ -15,12 +15,12 @@ A Django-based user authentication system with JWT tokens, Redis caching for pas
 
 ## Tech Stack
 
-- **Backend**: Django 4.2 + Django REST Framework
+- **Backend**: Django 4.2.7 Django REST Framework
 - **Database**: PostgreSQL
 - **Cache**: Redis
 - **Authentication**: JWT (Simple JWT)
-- **Documentation**: drf-yasg (Swagger/OpenAPI)
-- **Deployment**: Railway/Render ready with Gunicorn + WhiteNoise
+- **Documentation**: drf-spectacular (Swagger/OpenAPI)
+- **Deployment**: Render ready with Gunicorn + WhiteNoise
 
 ## Quick Start
 
@@ -28,8 +28,8 @@ A Django-based user authentication system with JWT tokens, Redis caching for pas
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd auth_service
+git clone https://github.com/mantle-bearer/bill-station-app.git
+cd bill-station-app
 
 # Build and run with Docker Compose
 docker-compose up --build
@@ -42,7 +42,7 @@ docker-compose exec web python manage.py createsuperuser
 
 # Access the application
 # API: http://localhost:8000
-# Swagger: http://localhost:8000/swagger/
+# Swagger: http://127.0.0.1:8000/api/schema/swagger/
 # Admin: http://localhost:8000/admin/
 ```
 
@@ -76,7 +76,7 @@ DB_HOST=your_postgres_host
 DB_PORT=5432
 
 # Alternative: Use DATABASE_URL for deployment platforms
-# DATABASE_URL=postgresql://user:password@host:port/database
+DATABASE_URL=postgresql://user:password@host:port/database
 
 # Redis Configuration
 REDIS_URL=redis://your_redis_host:6379/1
@@ -91,18 +91,17 @@ ALLOWED_HOSTS=localhost,127.0.0.1,your-domain.com
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/auth/register/` | User registration | No |
-| POST | `/api/auth/login/` | User login | No |
-| POST | `/api/auth/forgot-password/` | Request password reset | No |
-| POST | `/api/auth/reset-password/` | Reset password with token | No |
-| GET | `/api/auth/profile/` | Get user profile | Yes |
-| GET | `/swagger/` | API Documentation | No |
+| POST | `/api/auth/register` | User registration | No |
+| POST | `/api/auth/login` | User login | No |
+| POST | `/api/auth/forgot-password` | Request password reset | No |
+| POST | `/api/auth/reset-password` | Reset password with token | No |
+| GET | `/api/schema/swagger` | API Documentation | No |
 
 ### Example Usage
 
 #### 1. Register a new user
 ```bash
-curl -X POST http://localhost:8000/api/auth/register/ \
+curl -X POST http://localhost:8000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -114,7 +113,7 @@ curl -X POST http://localhost:8000/api/auth/register/ \
 
 #### 2. Login
 ```bash
-curl -X POST http://localhost:8000/api/auth/login/ \
+curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -122,47 +121,27 @@ curl -X POST http://localhost:8000/api/auth/login/ \
   }'
 ```
 
-#### 3. Access protected endpoint
+#### 3. Forgot Password
 ```bash
-curl -X GET http://localhost:8000/api/auth/profile/ \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-#### 4. Forgot Password
-```bash
-curl -X POST http://localhost:8000/api/auth/forgot-password/ \
+curl -X POST http://localhost:8000/api/auth/forgot-password \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com"
   }'
 ```
 
-#### 5. Reset Password
+#### 4. Reset Password
 ```bash
-curl -X POST http://localhost:8000/api/auth/reset-password/ \
+curl -X POST http://localhost:8000/api/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
-    "token": "RESET_TOKEN_FROM_STEP_4",
+    "token": "RESET_TOKEN_FROM_STEP_3",
     "new_password": "NewStrongPassword123!",
     "confirm_password": "NewStrongPassword123!"
   }'
 ```
 
-## Deployment
-
-### Railway Deployment
-
-1. Connect your GitHub repository to Railway
-2. Set environment variables in Railway dashboard:
-   - `DATABASE_URL` (Railway PostgreSQL)
-   - `REDIS_URL` (Railway Redis)
-   - `SECRET_KEY`
-   - `DEBUG=False`
-   - `ALLOWED_HOSTS=*.up.railway.app,your-domain.com`
-
-3. Deploy automatically on push to main branch
-
-### Render Deployment
+## Render Deployment
 
 1. Connect your GitHub repository to Render
 2. Create a new Web Service
@@ -183,7 +162,7 @@ curl -X POST http://localhost:8000/api/auth/reset-password/ \
 python manage.py test
 
 # Run specific test
-python manage.py test accounts.tests.UserRegistrationTestCase
+python manage.py test authentication.tests.UserRegistrationTestCase
 
 # Run with coverage
 pip install coverage
@@ -210,17 +189,10 @@ coverage report
 
 ## Live Demo
 
-🚀 **Deployed Application**: [Your Railway/Render URL here]
+ **Deployed Application**: [Your Render URL here]
 
-📚 **API Documentation**: [Your Railway/Render URL]/swagger/
+ **API Documentation**: [Your Render URL]/swagger/
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Run the test suite
-6. Submit a pull request
 ```
 ```
