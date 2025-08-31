@@ -189,6 +189,6 @@ coverage report
 
 ## Live Demo
 
- **Deployed Application**: [Your Render URL here]
+ **Deployed Application**: https://bill-station-app.onrender.com
 
- **API Documentation**: [Your Render URL]/swagger/
+ **API Documentation**: https://bill-station-app.onrender.com/api/schema/swagger/

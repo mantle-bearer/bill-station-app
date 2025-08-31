@@ -142,6 +142,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',  # Default for anonymous users
+        'rest_framework.throttling.UserRateThrottle',  # Default for authenticated users
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '5/min',  # Allow max 5 login attempts per minute
+        'password_reset': '3/min',  # Max 3 password reset requests per minute
+        'anon': '100/day',
+        'user': '1000/day',
+    },
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 

@@ -1,6 +1,7 @@
 from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from .serializers import (
     UserRegistrationSerializer, 
     LoginSerializer, 
@@ -27,6 +28,13 @@ def get_tokens_for_user(user):
 def generate_reset_token():
     """Generate a secure random token"""
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+
+class LoginRateThrottle(UserRateThrottle):
+    scope = 'login'
+
+class PasswordResetRateThrottle(UserRateThrottle):
+    scope = 'password_reset'
+
 
 
 class RegisterView(generics.CreateAPIView):
@@ -110,6 +118,7 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [LoginRateThrottle]
     
     @extend_schema(
         tags=["Authentication"],
@@ -192,6 +201,7 @@ class LoginView(generics.GenericAPIView):
 class ForgotPasswordView(generics.GenericAPIView):
     serializer_class = ForgotPasswordSerializer
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
     
     @extend_schema(
         tags=["Authentication"],
